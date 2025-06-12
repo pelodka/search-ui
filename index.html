@@ -71,15 +71,20 @@
     <button onclick="applyRefinement('Best Practices', this)">Best Practices</button>
   </div>
 
-  <gcse:searchresults-only></gcse:searchresults-only>
+  <div id="searchresults"></div>
 
   <script>
     let activeButton = null;
 
     window.__gcse = {
-      callback: () => {
+      callback: function () {
+        google.search.cse.element.render({
+          div: "searchresults",
+          tag: "searchresults-only"
+        });
+
         const searchInput = document.getElementById('custom-query');
-        const searchEl = google.search.cse.element.getElement('searchresults-only');
+        const searchEl = google.search.cse.element.getElement('searchresults');
 
         searchInput.addEventListener('keydown', function (e) {
           if (e.key === 'Enter' && searchEl) {
@@ -93,7 +98,7 @@
 
     function applyRefinement(label, button) {
       const query = document.getElementById('custom-query').value || '';
-      const searchEl = google.search.cse.element.getElement('searchresults-only');
+      const searchEl = google.search.cse.element.getElement('searchresults');
       if (searchEl) {
         searchEl.execute(`${query} more:${label}`);
       }
