@@ -9,21 +9,11 @@
       font-family: sans-serif;
       padding: 1rem;
     }
-    .search-box {
-      margin-bottom: 1rem;
-    }
-    .search-box input {
-      width: 100%;
-      padding: 0.5rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 0.5rem;
-    }
     .custom-refinements {
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
-      margin-bottom: 1rem;
+      margin: 1rem 0;
     }
     .custom-refinements button {
       background-color: #2d8cff;
@@ -53,10 +43,6 @@
 <body>
   <h1>Veeam Help Center Search</h1>
 
-  <div class="search-box">
-    <input type="text" id="custom-query" placeholder="Search Veeam documentation..." />
-  </div>
-
   <div class="custom-refinements">
     <button onclick="applyRefinement('Veeam Data Platform', this)" title="Veeam Data Platform">Veeam Data Platform</button>
     <button onclick="applyRefinement('Veeam Data Cloud', this)" title="Veeam Data Cloud">Veeam Data Cloud</button>
@@ -69,47 +55,17 @@
     <button onclick="applyRefinement('Best Practices', this)" title="Best Practices">Best Practices</button>
   </div>
 
-  <gcse:searchresults-only></gcse:searchresults-only>
+  <gcse:search></gcse:search>
 
   <script>
     let activeButton = null;
 
-    function getSearchElement(retries = 20) {
-      const tryGet = () => {
-        const searchEl = google.search?.cse?.element?.getElement("searchresults-only");
-        if (searchEl) {
-          initSearchHandlers();
-        } else if (retries > 0) {
-          setTimeout(() => tryGet(--retries), 200);
-        } else {
-          console.warn("Failed to detect search element after multiple tries.");
-        }
-      };
-      tryGet();
-    }
-
-    window.__gcse = {
-      callback: getSearchElement
-    };
-
-    function initSearchHandlers() {
-      const inputEl = document.getElementById("custom-query");
-      inputEl.addEventListener("keydown", function (e) {
-        if (e.key === "Enter") {
-          const searchEl = google.search.cse.element.getElement("searchresults-only");
-          searchEl.execute(this.value);
-          if (activeButton) activeButton.classList.remove("active");
-          activeButton = null;
-        }
-      });
-    }
-
     function applyRefinement(label, button) {
-      const inputEl = document.getElementById("custom-query");
-      const query = inputEl.value || '';
-      const searchEl = google.search.cse.element.getElement("searchresults-only");
-      if (searchEl) {
-        searchEl.execute(`${query} more:${label}`);
+      const inputBox = document.querySelector('input.gsc-input');
+      if (inputBox) {
+        inputBox.value = `more:${label}`;
+        inputBox.focus();
+        inputBox.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
       }
 
       if (activeButton) activeButton.classList.remove('active');
