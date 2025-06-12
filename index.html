@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Veeam Help Center Search</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 1rem;
+    }
+    .search-box {
+      margin-bottom: 1rem;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+    }
+    .custom-refinements {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .custom-refinements button {
+      background-color: #2d8cff;
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .custom-refinements button.active {
+      background-color: #1b6fd3;
+      font-weight: bold;
+      box-shadow: 0 0 0 2px #004080 inset;
+    }
+    .custom-refinements button:hover {
+      background-color: #1b6fd3;
+    }
+    @media (max-width: 600px) {
+      .custom-refinements {
+        flex-direction: column;
+      }
+    }
+  </style>
+  <script async src="https://cse.google.com/cse.js?cx=d1383e1ccca9f4d20"></script>
+</head>
+<body>
+  <h1>Veeam Help Center Search</h1>
+
+  <div class="search-box">
+    <input type="text" id="custom-query" placeholder="Search Veeam documentation..." />
+  </div>
+
+  <div class="custom-refinements">
+    <button onclick="applyRefinement('Veeam Data Platform', this)" title="Veeam Data Platform">Veeam Data Platform</button>
+    <button onclick="applyRefinement('Veeam Data Cloud', this)" title="Veeam Data Cloud">Veeam Data Cloud</button>
+    <button onclick="applyRefinement('Cloud & SaaS Data Protection', this)" title="Cloud & SaaS Data Protection">Cloud & SaaS Data Protection</button>
+    <button onclick="applyRefinement('Physical & Endpoint Protection', this)" title="Physical & Endpoint Protection">Physical & Endpoint Protection</button>
+    <button onclick="applyRefinement('Monitoring & Analytics', this)" title="Monitoring & Analytics">Monitoring & Analytics</button>
+    <button onclick="applyRefinement('Security & Threat Response', this)" title="Security & Threat Response">Security & Threat Response</button>
+    <button onclick="applyRefinement('Integrations & Development', this)" title="Integrations & Development">Integrations & Development</button>
+    <button onclick="applyRefinement('Service Provider Operations', this)" title="Service Provider Operations">Service Provider Operations</button>
+    <button onclick="applyRefinement('Best Practices', this)" title="Best Practices">Best Practices</button>
+  </div>
+
+  <gcse:searchresults-only></gcse:searchresults-only>
+
+  <script>
+    let activeButton = null;
+
+    function getSearchElement(retries = 20) {
+      const tryGet = () => {
+        const searchEl = google.search?.cse?.element?.getElement("searchresults-only");
+        if (searchEl) {
+          initSearchHandlers();
+        } else if (retries > 0) {
+          setTimeout(() => tryGet(--retries), 200);
+        } else {
+          console.warn("Failed to detect search element after multiple tries.");
+        }
+      };
+      tryGet();
+    }
+
+    window.__gcse = {
+      callback: getSearchElement
+    };
+
+    function initSearchHandlers() {
+      const inputEl = document.getElementById("custom-query");
+      inputEl.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          const searchEl = google.search.cse.element.getElement("searchresults-only");
+          searchEl.execute(this.value);
+          if (activeButton) activeButton.classList.remove("active");
+          activeButton = null;
+        }
+      });
+    }
+
+    function applyRefinement(label, button) {
+      const inputEl = document.getElementById("custom-query");
+      const query = inputEl.value || '';
+      const searchEl = google.search.cse.element.getElement("searchresults-only");
+      if (searchEl) {
+        searchEl.execute(`${query} more:${label}`);
+      }
+
+      if (activeButton) activeButton.classList.remove('active');
+      if (button) button.classList.add('active');
+      activeButton = button;
+    }
+  </script>
+</body>
+</html>
